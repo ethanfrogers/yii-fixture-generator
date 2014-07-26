@@ -55,10 +55,27 @@ do{
     $continue = trim(fgets($stdin));
 }while($continue != 'no');
 
-if(count($to_generate) > 0){
-    print_r($to_generate);
-} else {die();}
 
+echo "Writing fixtures to file\n";
+file_put_contents('output.php', fixtureTemplate($to_generate));
+
+
+function fixtureTemplate($fixtures){
+    $tpl = "<?php\n";
+    $tpl .= "return array(\n";
+    foreach($fixtures as $index => $fixture){
+        $tpl .= "array(";
+        foreach($fixture as $name => $value){
+            $tpl .="'$name' => '$value',";
+        }
+        $tpl .= "),\n";
+    }
+    $tpl .= ");\n";
+    $tpl .= "?>";
+
+
+    return $tpl;
+}
 
 
 
