@@ -8,6 +8,6 @@ $ php generator.php
 and the script will handle building the fixtures.
 
 #TODO
-+Item alias for using a specific fixture
-+custom filename
-+loop script once complete for creating another fixture file
++ Item alias for using a specific fixture
++ custom filename
++ loop script once complete for creating another fixture file
