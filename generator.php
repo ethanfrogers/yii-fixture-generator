@@ -1,4 +1,9 @@
 <?php
+$OUTFILE = 'output.php';
+
+if(isset($argv[1]) && $argv[1] != ""){
+    $OUTFILE = $argv[1];
+}
 
 
 echo "Generate new Yii Fixture?[yes|no]:";
@@ -56,8 +61,8 @@ do{
 }while($continue != 'no');
 
 
-echo "Writing fixtures to file\n";
-file_put_contents('output.php', fixtureTemplate($to_generate));
+echo "Writing fixtures to file: $OUTFILE\n";
+file_put_contents($OUTFILE, fixtureTemplate($to_generate));
 
 
 function fixtureTemplate($fixtures){
