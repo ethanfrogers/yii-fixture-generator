@@ -52,12 +52,22 @@ do{
 $to_generate = array();
 do{
     echo "Generate New Fixture\n";
+    echo "Alias (Enter for no alias):";
+    $alias = trim(fgets($stdin));
+
     $temp = array();
     foreach($columns as $index=>$column_name){
         echo "Enter Value for $column_name: ";
         $tmp[$column_name] = trim(fgets($stdin));
     }
-    $to_generate[] = $tmp;
+
+    if($alias != ''){
+        $to_generate[$alias] = $tmp;
+    }
+    else {
+        $to_generate[] = $tmp;
+    }
+
     echo "Generate Another Fixtue? [yes|no]:";
     $continue = trim(fgets($stdin));
 }while($continue != 'no');
@@ -71,6 +81,9 @@ function fixtureTemplate($fixtures){
     $tpl = "<?php\n";
     $tpl .= "return array(\n";
     foreach($fixtures as $index => $fixture){
+        if(!is_numeric($index)){
+            $tpl .= "'$index' => ";
+        }
         $tpl .= "array(";
         foreach($fixture as $name => $value){
             $tpl .="'$name' => '$value',";
