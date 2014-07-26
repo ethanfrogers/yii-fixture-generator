@@ -9,5 +9,6 @@ and the script will handle building the fixtures.
 
 #TODO
 + Item alias for using a specific fixture
-+ custom filename
-+ loop script once complete for creating another fixture file
++ Loop script once complete for creating another fixture file
++ Diff database table/another fixture file for column names and changes
++ Merge fixture file if exists
