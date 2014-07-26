@@ -4,7 +4,9 @@ $OUTFILE = 'output.php';
 if(isset($argv[1]) && $argv[1] != ""){
     $OUTFILE = $argv[1];
 }
-
+if(!preg_match("/^.*\.php$/", $OUTFILE)){
+    $OUTFILE.=".php";
+}
 
 echo "Generate new Yii Fixture?[yes|no]:";
 
