@@ -1,12 +1,27 @@
 <?php
 $OUTFILE = 'output.php';
 
-if(isset($argv[1]) && $argv[1] != ""){
-    $OUTFILE = $argv[1];
-}
-if(!preg_match("/^.*\.php$/", $OUTFILE)){
-    $OUTFILE.=".php";
-}
+//process file arguments
+if(count($argv) > 1){
+    foreach ($argv as $index => $pot_option) {
+        $option_array = processOption($pot_option);
+        if(isset($option_array['option'])){
+            switch($option_array['option']){
+                case 'append':
+                    $APPEND_FILE = $option_array['params'];
+                    break;
+            }
+        }
+
+    }
+} 
+
+// if(isset($argv[1]) && $argv[1] != ""){
+//     $OUTFILE = $argv[1];
+// }
+// if(!preg_match("/^.*\.php$/", $OUTFILE)){
+//     $OUTFILE.=".php";
+// }
 
 echo "Generate new Yii Fixture?[yes|no]:";
 
@@ -21,17 +36,25 @@ if(trim($continue) != 'yes'){
 echo "Enter Table Name:";
 $table_name = trim(fgets($stdin));
 echo "Table Name: $table_name\n";
+//should have done this from the beginning
+$OUTFILE = $table_name . ".php";
 
-//define columns to be used
+
 $columns = array();
-echo "Enter Column Names(Enter to quit)\n";
-do{
-    echo "Column: ";
-    $column = fgets($stdin);
-    if(trim($column) != ''){
-        $columns[] = trim($column);
-    }
-}while(trim($column) != "");
+if(isset($APPEND_FILE)){
+    echo "Importing $APPEND_FILE\n";
+    $APPEND_FIXTURE = importAndProcessFixtureFile($APPEND_FILE); 
+    $columns = array_keys($APPEND_FIXTURE[0]);
+} else {
+    echo "Enter Column Names(Enter to quit)\n";
+    do{
+        echo "Column: ";
+        $column = trim(fgets($stdin));
+        if($column != ''){
+            $columns[] = $column;
+        }
+    }while($column != "");
+}
 
 //make sure there are no problems with the
 //column names
@@ -50,6 +73,10 @@ do{
 
 
 $to_generate = array();
+if(isset($APPEND_FIXTURE)){
+    $to_generate = array_merge_recursive($APPEND_FIXTURE, $to_generate);
+}
+
 do{
     echo "Generate New Fixture\n";
     echo "Alias (Enter for no alias):";
@@ -72,6 +99,9 @@ do{
     $continue = trim(fgets($stdin));
 }while($continue != 'no');
 
+
+echo "Fixtures to generate\n";
+print_r($to_generate);
 
 echo "Writing fixtures to file: $OUTFILE\n";
 file_put_contents($OUTFILE, fixtureTemplate($to_generate));
@@ -98,6 +128,29 @@ function fixtureTemplate($fixtures){
 }
 
 
+function processOption($potential_option){
+    $retval = array();
 
+    if(preg_match("/^--(.*)=(.*)$/", $potential_option, $matches)){
+        if(isset($matches[1]) && $matches[1] != ''){
+                $retval['option'] = $matches[1];
+        }
+        if(isset($matches[2]) && $matches[2] != ''){
+                $retval['params'] = $matches[2];
+        }
+    }
+
+    return count($retval) > 0 ? $retval : false;
+}
+
+function importAndProcessFixtureFile($file){
+    try{
+        $old_fixture = require($file);
+    } catch(Exception $e){
+        echo "Could not find target file\n";
+    }
+
+    return $old_fixture;
+}
 
 ?>
